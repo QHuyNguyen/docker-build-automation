@@ -1,0 +1,71 @@
+name: Dockerfile package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  list-available-images:
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.list.outputs.image-dir }}
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: List out available images
+        id: list
+        run: |
+          images=$(ls ./container_images/)
+          echo "image-dir=$images" >> "$GITHUB_OUTPUT"
+          
+      - name: Display list of image directory
+        run: |
+          echo "${{ steps.list.outputs.image-dir }}"
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: list-available-images
+    steps:
+      - uses: actions/checkout@v5
+      - name: Login to docker hub
+        id: login
+        run: |
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build docker image for x86
+        id: build
+        env:
+          OUTPUT1: ${{needs.list-available-images.outputs.output1}}
+        run: |
+          docker build ./container_images/$OUTPUT1/. -t arthur210/terraform_runner:3.0.0 --platform linux/amd64 2>&1 | tee out.plan
+          echo 'build<<EOF' >> $GITHUB_OUTPUT
+          echo ":orange_circle:" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          cat out.plan >>  $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+          docker image ls
+
+      - name: Display docker build output
+        run: |
+          echo "${{ steps.build.outputs.build }}"
+
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ${{ steps.build.outputs.build }}
+          GITHUB_TOKEN:  ${{ secrets.github_token }}
+
+#      - name: Publish docker image for x86
+#        id: publish
+#        run: |
+#          docker push arthur210/terraform_runner:3.0.0
+#
+
+  

@@ -1,0 +1,14 @@
+#1
+#TERRAFORM_DOCS_VERSION=0.16.0
+#curl -L -o /tmp/terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v${TERRAFORM_DOCS_VERSION}/terraform-docs-v${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
+#tar -xvf /tmp/terraform-docs.tar.gz -C /tmp    
+#mv /tmp/terraform-docs /usr/local/bin/
+#rm -rf /tmp/*
+
+#2
+TERRAFORM_DOCS_VERSION=0.16.0 TERRAFORM_VERSION=1.3.9
+curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip 
+unzip /tmp/terraform.zip -d /tmp/ 
+mv /tmp/terraform /usr/local/bin/terraform
+chmod +x /usr/local/bin/terraform  
+rm -rf /tmp/*
