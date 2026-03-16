@@ -31,7 +31,7 @@ jobs:
     needs: list-available-images
     strategy:
       matrix:
-        directory: ${{ needs.list-available-images.outputs.output1 }}
+        directory: ${{ fromJson(needs.list-available-images.outputs.output1) }}
     steps:
       - uses: actions/checkout@v5
       - name: Login to docker hub
