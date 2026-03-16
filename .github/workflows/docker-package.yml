@@ -63,7 +63,7 @@ jobs:
         with:
           message: |
             ${{ steps.build.outputs.build }}
-          GITHUB_TOKEN:  ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ github.token }}
 
 #      - name: Publish docker image for x86
 #        id: publish
