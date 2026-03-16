@@ -19,8 +19,8 @@ jobs:
       - name: List out available images using jq to produce matrix e.g. ["runner","terraform"]
         id: list
         run: |
-          images=$(ls ./container_images/)
-          echo "image-dir=$images" | jq -R -s -c 'split("\n")[:-1]' >> "$GITHUB_OUTPUT"
+          images=$(ls ./container_images/ | jq -R -s -c 'split("\n")[:-1]')
+          echo "image-dir=$images" >> "$GITHUB_OUTPUT"
           
       - name: Display list of image directory
         run: |
