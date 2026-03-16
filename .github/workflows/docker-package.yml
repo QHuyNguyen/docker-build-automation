@@ -16,7 +16,7 @@ jobs:
   list-available-images:
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.list.outputs.image-dir }}
+      output: ${{ steps.list.outputs.image-dir }}
     steps:
       - uses: actions/checkout@v5
       
@@ -35,7 +35,7 @@ jobs:
     needs: list-available-images
     strategy:
       matrix:
-        directory: ${{ fromJson(needs.list-available-images.outputs.output1) }}
+        directory: ${{ fromJson(needs.list-available-images.outputs.output) }}
     steps:
       - uses: actions/checkout@v5
       - name: Login to docker hub
@@ -45,8 +45,6 @@ jobs:
 
       - name: Build docker image for x86
         id: build
-        #env:
-        #  OUTPUT1: ${{needs.list-available-images.outputs.output1}}
         run: |
           docker build ./container_images/${{ matrix.directory }}/. -t arthur210/terraform_runner:3.0.0 --platform linux/amd64 2>&1 | tee out.plan
           echo 'build<<EOF' >> $GITHUB_OUTPUT
