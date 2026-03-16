@@ -50,7 +50,7 @@ jobs:
         run: |
           docker build ./container_images/${{ matrix.directory }}/. -t arthur210/terraform_runner:3.0.0 --platform linux/amd64 2>&1 | tee out.plan
           echo 'build<<EOF' >> $GITHUB_OUTPUT
-          echo ":orange_circle:" >> $GITHUB_OUTPUT
+          echo ":orange_circle: ${{ matrix.directory }}" >> $GITHUB_OUTPUT
           echo "\`\`\`" >> $GITHUB_OUTPUT
           cat out.plan >>  $GITHUB_OUTPUT
           echo "\`\`\`" >> $GITHUB_OUTPUT
