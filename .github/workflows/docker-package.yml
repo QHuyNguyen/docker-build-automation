@@ -57,13 +57,13 @@ jobs:
         run: |
           echo "${{ steps.build.outputs.build }}"
 
-      - name: Comment PR
-        if: github.event_name == 'pull_request'
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: |
-            ${{ steps.build.outputs.build }}
-          GITHUB_TOKEN:  ${{ secrets.github_token }}
+      #- name: Comment PR
+      #  if: github.event_name == 'pull_request'
+      #  uses: thollander/actions-comment-pull-request@v2
+      #  with:
+      #    message: |
+      #      ${{ steps.build.outputs.build }}
+      #    GITHUB_TOKEN:  ${{ secrets.github_token }}
 
 #      - name: Publish docker image for x86
 #        id: publish
