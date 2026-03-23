@@ -1,0 +1,22 @@
+name: Self-Hosted Runner Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'A message for the test run'
+        required: false
+        default: 'Hello World'
+
+jobs:
+  test-job:
+    # Use the 'self-hosted' label to target your runner
+    runs-on: [self-hosted, Linux] # Add other custom labels if defined
+
+    steps:
+      - name: Say hello
+        run: |
+          echo "Running on self-hosted runner"
+          echo "Message: ${{ github.event.inputs.message }}"
+      - name: List files
+        run: ls -la
