@@ -57,4 +57,4 @@ ENTRYPOINT [ "./entrypoint.sh" ]
 #
 #CMD ["./run.sh"]
 
-#k create secret generic pat-runner --from-literal=GH_PAT=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 --dry-run=client -o yaml > pat-runner-secret.yml
+#k create secret generic pat-runner --from-literal=GH_PAT=xxx --dry-run=client -o yaml > pat-runner-secret.yml
