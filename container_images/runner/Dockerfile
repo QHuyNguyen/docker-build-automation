@@ -1,37 +1,49 @@
-FROM ubuntu:24.04 AS base
+FROM ubuntu:22.04 AS build
 WORKDIR /work
 
-RUN apt update 
-RUN apt install git \
+RUN apt update && apt install git \
     curl \
-    wget \
-    jq -y
+    ca-certificates -y --no-install-recommends \
+    && update-ca-certificates && rm -rf /var/lib/apt/lists/*
 
-RUN apt update && apt upgrade -y
+COPY --chmod=777 ./github_runner_command .
 
-COPY --chmod=777 ./github_runner_command /work
-
+# Download and extract GitHub Actions runner
 RUN ./github_runner_command
 
-RUN ./actions-runner/bin/installdependencies.sh
+FROM ubuntu:22.04 AS runtime
 
-RUN chown ubuntu:ubuntu -R /work
+RUN adduser ubuntu && \
+    mkdir -p /home/ubuntu && \
+    chown -R ubuntu:ubuntu /home/ubuntu
+
+#Ensure the 'ubuntu' user owns EVERYTHING in /actions-runner before switchin user
+RUN mkdir /actions-runner && chown ubuntu:ubuntu /actions-runner
+
+WORKDIR /actions-runner
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    jq \
+    ca-certificates \
+    && update-ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy runner from build stage
+COPY --from=build --chown=ubuntu:ubuntu /work/actions-runner .
+
+# Install any missing dependencies for .NET Core (required by runner)
+RUN ./bin/installdependencies.sh
 
 USER ubuntu
 
-RUN whoami
-
+# GitHub PAT and repo name will be injected at runtime
 ARG GH_PAT
-ARG REPO_NAME="docker-build-automation"
-RUN ls -la ./actions-runner/
+ENV GH_PAT=$GH_PAT
 
-RUN ls -la ./actions-runner/bin/
+ENV REPO_NAME="docker-build-automation"
 
-RUN REG_TOKEN=$(curl -s -X POST \
-    -H "Authorization: Bearer ${GH_PAT}" \
-    -H "Accept: application/vnd.github+json" \
-    https://api.github.com/repos/QHuyNguyen/${REPO_NAME}/actions/runners/registration-token \
-    | jq -r .token) && \
-    ./actions-runner/config.sh --url https://github.com/QHuyNguyen/docker-build-automation --token ${REG_TOKEN}
+COPY --chmod=777 ./entrypoint.sh .
 
-CMD ["./run.sh"]
+ENTRYPOINT [ "./entrypoint.sh" ]
