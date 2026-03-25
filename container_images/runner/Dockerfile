@@ -47,14 +47,3 @@ ENV REPO_NAME="docker-build-automation"
 COPY --chmod=777 ./entrypoint.sh .
 
 ENTRYPOINT [ "./entrypoint.sh" ]
-
-#RUN REG_TOKEN=$(curl -s -X POST \
-#    -H "Authorization: Bearer ${GH_PAT}" \
-#    -H "Accept: application/vnd.github+json" \
-#    https://api.github.com/repos/QHuyNguyen/${REPO_NAME}/actions/runners/registration-token \
-#    | jq -r .token) && \
-#    ./config.sh --url https://github.com/QHuyNguyen/docker-build-automation --token ${REG_TOKEN}
-#
-#CMD ["./run.sh"]
-
-#k create secret generic pat-runner --from-literal=GH_PAT=xxx --dry-run=client -o yaml > pat-runner-secret.yml
